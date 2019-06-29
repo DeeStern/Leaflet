@@ -1,7 +1,9 @@
+//Devin Stern Cohort 3 Leafleft HW
+
 // Creating map object
 var myMap = L.map("map", {
-  center: [39.0, -94.5],
-  zoom: 4
+  center: [38.89, -101.75],
+  zoom: 4.9
 });
 
 // Adding tile layer to the map
@@ -13,61 +15,66 @@ L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={
 }).addTo(myMap);
 
 // Store API query variables
-var url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson";
+var url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
 
 // Grab the data with d3
-d3.json(url, function(response) {
-  console.log(response);
-});
+d3.json(url, function(data) {
+  console.log(data);
+  // L.geoJson(data).addTo(myMap);
+console.log("Checkpoint 1, after console.log data");
+  
+    var earthquakeData = data.features;
+
+    quakeLocation = [];
+    magnitudeArray = [];
+    
+
+console.log("checkpoint 2, after earthquake array is defined");
 
   // Loop through data
-  for (var i = 0; i < response; i++) {
+    for (var i = 0; i < earthquakeData.length; i++) {
 
-    // Set the data location property to a variable
-    var location = response[i].location;
+      // Set the data location property to a variable
+      var location = earthquakeData[i].geometry.coordinates;
+      var size = earthquakeData[i].properties.mag;
 
-    if (location) {
-      L.marker([location.coordinates[1], location.coordinates[0]]).addTo(myMap);
-    }
-  };
+      quakeLocation.push([location[1], location [0]]);
+      magnitudeArray.push([size]);
+    };
+
+  console.log(magnitudeArray);
+
+      // Loop through arrays and create one marker for each quake
+      for (var i = 0; i < earthquakeData.length; i++) {
+
+          // Conditionals for earthquake points
+          var color = "";
+          if (magnitudeArray[i] > 6.9) {
+          color = "red";
+          }
+          else if (magnitudeArray[i] > 6) {
+          color = "yellow";
+          }
+          else if (magnitudeArray[i] > 5.4) {
+          color = "orange";
+          }
+          else if (magnitudeArray[i] > 2.4) {
+          color = "coral";
+          }
+          else {
+          color = "teal";
+          }
+          console.log("checkpoint 2")
+          
+          // Add circles to map
+          L.circle(quakeLocation[i], {
+              fillOpacity: 0.75,
+              color: color,
+              fillColor: color,
+              // Adjust radius
+              radius: magnitudeArray[i] * 15000
+          }).bindPopup("<h1>" + earthquakeData[i].properties.place + "</h1> <hr> <h3> Magnitude of " + magnitudeArray[i] + "</h3>").addTo(myMap);
+      }
+});
 
 
-
-//     // Check for location property
-//     if (location) {
-
-//         // Conditionals for countries points
-//     var color = "";
-//     if (countries[i].points > 200) {
-//       color = "yellow";
-//     }
-//     else if (countries[i].points > 100) {
-//       color = "blue";
-//     }
-//     else if (countries[i].points > 90) {
-//       color = "green";
-//     }
-//     else {
-//       color = "red";
-//     }
-
-//     // Check for location property
-//     if (location) {
-
-//      // Add circles to map
-//     L.circle(countries[i].location, {
-//       fillOpacity: 0.75,
-//       color: "white",
-//       fillColor: color,
-//     // Adjust radius
-//       radius: countries[i].points * 1500
-//     }).bindPopup("<h1>" + countries[i].name + "</h1> <hr> <h3>Points: " + countries[i].points + "</h3>").addTo(myMap);
-// }
-//     }
-
-//   }
-
-//   // Add our marker cluster layer to the map
-//   myMap.addLayer(markers);
-
-// ;
